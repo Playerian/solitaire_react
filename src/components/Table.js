@@ -1,5 +1,6 @@
 import React from 'react';
-import Timer from './Timer.js';
+import Timer from './Table/Timer.js';
+import CardShowing from './Table/CardShowing.js';
 
 export default class Table extends React.Component {
   render(){
@@ -9,7 +10,7 @@ export default class Table extends React.Component {
         <button id="start">Let The Game Begin!</button>
         <button id="tb">Takeback</button>
         <p>% of card showing</p>
-        <input id="showPercent" value="25"></input>
+        < CardShowing/>
       </div>
     );
   } 
