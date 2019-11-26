@@ -3,7 +3,8 @@ import React from 'react';
 import './App.css'; 
 //components
 import Table from './components/Table.js';
-import Table from './components/Foundation.js';
+import Foundation from './components/Foundation.js';
+import Columns from './components/Columns.js';
 
 export default class App extends React.Component {
   render(){
@@ -23,17 +24,9 @@ export default class App extends React.Component {
         </div>
         <div id="father">
               <div id="top">
-                  <Foundation/>
+                  <Foundation id="foundation"/>
               </div>
-              <div id="columns">
-                  <div id="c1" class="bottom"></div>
-                  <div id="c2" class="bottom"></div>
-                  <div id="c3" class="bottom"></div>
-                  <div id="c4" class="bottom"></div>
-                  <div id="c5" class="bottom"></div>
-                  <div id="c6" class="bottom"></div>
-                  <div id="c7" class="bottom"></div>
-              </div>
+              <Columns id="columns"/>
           </div>
       </div>
     );
