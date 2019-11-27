@@ -12,7 +12,7 @@ export default class Table extends React.Component {
         < StartGame id="start"/>
         < TakeBack id="tb"/>
         <p>% of card showing</p>
-        < CardShowing/>
+        < CardShowing setVar={(index, value) => this.props.setVar(index, value)}/>
       </div>
     );
   } 
