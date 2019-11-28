@@ -4,7 +4,7 @@ import React from 'react';
 export default class StartGame extends React.Component {
   render(){
     return(
-      <button>Let The Game Begin!</button>
+      <button id={this.props.id}>Let The Game Begin!</button>
     );
   } 
 }

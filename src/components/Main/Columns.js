@@ -9,7 +9,7 @@ export default class Columns extends React.Component {
       divs.push(<Bottom id={idName} className="bottom" key={i}/>);
     }
     return(
-      <div>
+      <div id={this.props.id}>
         {divs}
       </div>
     );

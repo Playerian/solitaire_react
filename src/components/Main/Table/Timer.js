@@ -4,7 +4,7 @@ import React from 'react';
 export default class Timer extends React.Component {
   render(){
     return(
-      <div>00:00</div>
+      <div id={this.props.id}>00:00</div>
     );
   } 
 }

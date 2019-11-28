@@ -4,7 +4,7 @@ import React from 'react';
 export default class TakeBack extends React.Component {
   render(){
     return(
-      <button>Takeback</button>
+      <button id={this.props.id}>Takeback</button>
     );
   } 
 }

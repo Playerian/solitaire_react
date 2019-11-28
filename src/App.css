@@ -1,4 +1,9 @@
 /*layout css*/
+.App{
+  height: 99vh;
+  width: 99vw;    
+}
+
 .top, .bottom{
   border:black 3px solid;
   border-radius: 10px;
