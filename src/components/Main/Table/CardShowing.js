@@ -8,7 +8,11 @@ export default class CardShowing extends React.Component {
   }
   handleChange(event) {
     this.setState({value: parseInt(event.target.value)});
-    this.props.setVar("percentCardShowing", this.state.value);
+    console.log(event.target.value)
+    this.props.setVar("showPercentOfCard", event.target.value);
+    if (this.props.getVar("beginned")){
+      this.props.getVar("render")();
+    }
   }
 
   render(){

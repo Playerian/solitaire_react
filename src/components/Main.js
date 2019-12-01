@@ -17,7 +17,7 @@ export default class Main extends React.Component {
             trash: [],
             reveal: [],
             holding: false,
-            holder: "",
+            holder: 0,
             found: {
                 f1: [],
                 f2: [],
@@ -304,7 +304,7 @@ export default class Main extends React.Component {
                             //turn into props instead
                             var element = {}//$("<img>").attr("class","card");
                             element.class = "card";
-                            element.id = card.name;//element.attr("id", card.name);
+                            element.id = card;//element.attr("id", card.name);
                             element.column = i;//element.addClass("c"+i);
                             element.row = i2;//element.addClass("r"+i2);
                             if (card.show === true){
@@ -340,7 +340,7 @@ export default class Main extends React.Component {
                             element.style.height = variables.height+"px";
                             //$("#c"+i).append(element);
                             //react is cancer
-                            columnComponents.push(<img className={element.class} style={element.style} src={element.src} id={element.id} column={element.column} row={element.row}></img>);
+                            columnComponents.push(<Card getVar={(index) => mainComponent.getVar(index)} className={element.class} style={element.style} src={element.src} id={element.id} column={element.column} row={element.row}/>);
                         }else{
                             break;
                         }
@@ -361,7 +361,7 @@ export default class Main extends React.Component {
                     element.style = {};
                     element.style.width = variables.width+"px";
                     element.style.height = variables.height+"px";
-                    allTrashComponents.push(<img className={element.class} id={element.id} src={element.src} style={element.style}></img>);// $("#trash").append(element);
+                    allTrashComponents.push(<Card getVar={(index) => mainComponent.getVar(index)} className={element.class} id={element.id} src={element.src} style={element.style}/>);// $("#trash").append(element);
                 }
                 //render in reveal
                 let allRevealComponents = [];
@@ -369,7 +369,7 @@ export default class Main extends React.Component {
                 for (var i = 0; i < reveal.length; i ++){
                     var card = cards[reveal[i]];
                     var element = {class: "card"};// var element = $("<img>").attr("class","card");
-                    element.id = reveal[i];// element.attr("id", reveal[i]);
+                    element.id = card;// element.attr("id", reveal[i]);
                     element.class += " reveal";// element.addClass("reveal");
                     element.src = "cards/" + card.number + "_" + card.suit + ".png";// element.attr("src", "cards/" + card.number + "_" + card.suit + ".png");
                     if (holder === card){
@@ -378,18 +378,19 @@ export default class Main extends React.Component {
                     element.style = {};
                     element.style.width = variables.width+"px";
                     element.style.height = variables.height+"px";
-                    allRevealComponents.push(<img src={element.src} className={element.class} src={element.src} id={element.id} style={element.style}></img>);//$("#reveal").append(element);
+                    allRevealComponents.push(<Card getVar={(index) => mainComponent.getVar(index)} src={element.src} className={element.class} src={element.src} id={element.id} style={element.style}/>);//$("#reveal").append(element);
                 }
                 //render in foundation
                 let allFoundComponents = [];
                 let found = variables.found;
                 for (var i2 = 1; i2 <= 4; i2 ++){
                     var foundation = found["f"+i2];
+                    let oneFoundComponents = [];
                     for (var i = 0; i < foundation.length; i ++){
                         var card = foundation[i];
                         var element = {};
                         element.class = "card";// var element = $("<img>").attr("class","card");
-                        element.id = foundation[i].name;// element.attr("id", foundation[i].name);
+                        element.id = foundation[i];// element.attr("id", foundation[i].name);
                         element.class += " foundCard";// element.addClass("foundCard");
                         element.class += " unclickable";// element.addClass("unclickable");
                         element.src = "cards/" + card.number + "_" + card.suit + ".png";// element.attr("src", "cards/" + card.number + "_" + card.suit + ".png");
@@ -400,8 +401,9 @@ export default class Main extends React.Component {
                         element.style.width = variables.width+"px";
                         element.style.height = variables.height+"px";
                         // $("#f"+i2).append(element);
-                        allFoundComponents.push(<img className={element.class} id={element.id} src={element.src} style={element.style}></img>);
+                        oneFoundComponents.push(<Card getVar={(index) => mainComponent.getVar(index)} className={element.class} id={element.id} src={element.src} style={element.style}/>);
                     }
+                    allFoundComponents.push(oneFoundComponents);
                 }
 
                 //react is cancer
@@ -421,8 +423,6 @@ export default class Main extends React.Component {
             randomInt: function (min, max) {
                 return Math.floor(Math.random() * (max - min + 1)) + min;
             },
-            //component specific var
-            percentCardShowing: 25,
             //component specific function
             trashClicked: function () {
                 //record move
@@ -458,43 +458,35 @@ export default class Main extends React.Component {
                 console.log(card);
                 //main function (just for quick use of return)
                 function mainDish() {
-                    let holding = variables.holding;
-                    let found = variables.found;
-                    let holder = variables.holder;
-                    let getCardPos = variables.getCardPos;
-                    let lastAct = variables.lastAct;
-                    let duang = variables.duang;
-                    let reveal = variables.reveal;
-                    let render = variables.render;
                     //check if card is face up
                     if (card.show === true) {
                         //release a card if holding a card
-                        if (holding === true) {
+                        if (variables.holding === true) {
                             //check if holding the same card
-                            if (card === holder) {
+                            if (card === variables.holder) {
                                 //check if can move to foundation
                                 for (var i = 4; i >= 1; i--) {
-                                    var foundation = found["f" + i];
+                                    var foundation = variables.found["f" + i];
                                     //check if not empty
                                     if (foundation.length > 0) {
                                         //get last card in foundation
                                         var last = foundation[foundation.length - 1];
-                                        if (holder.isOneHigher(last)) {
+                                        if (variables.holder.isOneHigher(last)) {
                                             //then check if suits are the same
-                                            if (holder.suit === last.suit) {
+                                            if (variables.holder.suit === last.suit) {
                                                 //then check if the holder card is the last card at the column
                                                 //or in trash
-                                                if (getCardPos(holder.column, holder.row + 1) === undefined || holder.inTrash() === true) {
+                                                if (variables.getCardPos(variables.holder.column, variables.holder.row + 1) === undefined || variables.holder.inTrash() === true) {
                                                     //record action
-                                                    if (holder.inTrash() === true) {
-                                                        lastAct = holder.name + "," + "found" + "," + "trash" + "," + number;
+                                                    if (variables.holder.inTrash() === true) {
+                                                        variables.lastAct = variables.holder.name + "," + "found" + "," + "trash" + "," + number;
                                                     } else {
-                                                        lastAct = holder.name + "," + "found" + "," + "C" + holder.column + "R" + holder.row + "," + number;
+                                                        variables.lastAct = variables.holder.name + "," + "found" + "," + "C" + variables.holder.column + "R" + variables.holder.row + "," + number;
                                                     }
                                                     //reset the card's position
-                                                    holder.reset();
+                                                    variables.holder.reset();
                                                     //then move holder to the foundation
-                                                    foundation.push(holder);
+                                                    foundation.push(variables.holder);
                                                 }
                                             }
                                         }
@@ -503,37 +495,37 @@ export default class Main extends React.Component {
                                         //if ace push to found
                                         if (card.number === 1) {
                                             //record action
-                                            if (holder.inTrash() === true) {
-                                                lastAct = holder.name + "," + "found" + "," + "trash" + "," + number;
+                                            if (variables.holder.inTrash() === true) {
+                                                variables.lastAct = variables.holder.name + "," + "found" + "," + "trash" + "," + number;
                                             } else {
-                                                lastAct = holder.name + "," + "found" + "," + "C" + holder.column + "R" + holder.row + "," + number;
+                                                variables.lastAct = variables.holder.name + "," + "found" + "," + "C" + variables.holder.column + "R" + variables.holder.row + "," + number;
                                             }
                                             //reset the card's position
-                                            holder.reset();
+                                            variables.holder.reset();
                                             //then move holder to the foundation
-                                            foundation.push(holder);
+                                            foundation.push(variables.holder);
                                         }
                                     }
                                 }
                                 //remove holding status
-                                holder = undefined;
-                                holding = false;
+                                variables.holder = undefined;
+                                variables.holding = false;
                                 return;
                             }
                             //check if releasing onto the right card
                             //check if clicked card is not on trash and foundation
                             if (card.inTrash() === false && card.inFound() === false) {
                                 //then check if able to move
-                                if (holder.isDiffColor(card) && holder.isOneLower(card) && card.getColumn()[card.getColumn().length - 1] === card) {
+                                if (variables.holder.isDiffColor(card) && variables.holder.isOneLower(card) && card.getColumn()[card.getColumn().length - 1] === card) {
                                     //if holder is on the field
-                                    if (holder.inTrash() === false && holder.inFound() === false) {
-                                        var row = holder.row;
-                                        var column = holder.column;
+                                    if (variables.holder.inTrash() === false && variables.holder.inFound() === false) {
+                                        var row = variables.holder.row;
+                                        var column = variables.holder.column;
                                         //if so then move the the holder and cards under holder under the card
                                         //put all cards under the holder into a list
                                         var list = [];
-                                        for (var i = holder.row; i <= 17; i++) {
-                                            var cardBelow = getCardPos(holder.column, i);
+                                        for (var i = variables.holder.row; i <= 17; i++) {
+                                            var cardBelow = variables.getCardPos(variables.holder.column, i);
                                             if (cardBelow !== undefined) {
                                                 list.push(cardBelow);
                                             } else {
@@ -551,31 +543,31 @@ export default class Main extends React.Component {
                                             list[i].row = card.row + i + 1;
                                         }
                                         //record moving act
-                                        lastAct = holder.name + "," + "move" + "," + "C" + column + "R" + row + "," + "C" + holder.column + "R" + holder.row;
+                                        variables.lastAct = variables.holder.name + "," + "move" + "," + "C" + column + "R" + row + "," + "C" + variables.holder.column + "R" + variables.holder.row;
                                     } else {
                                         //if in trash then move directly to field
-                                        if (holder.inTrash() === true) {
-                                            holder.column = card.column;
-                                            holder.row = card.row + 1;
+                                        if (variables.holder.inTrash() === true) {
+                                            variables.holder.column = card.column;
+                                            variables.holder.row = card.row + 1;
                                             //also remove holder in reveal pile
-                                            duang(reveal, holder.name);
+                                            variables.duang(variables.reveal, variables.holder.name);
                                             //record moving act
-                                            lastAct = holder.name + "," + "move" + "," + "trash" + "," + "C" + holder.column + "R" + holder.row;
+                                            variables.lastAct = variables.holder.name + "," + "move" + "," + "trash" + "," + "C" + variables.holder.column + "R" + variables.holder.row;
                                         }
                                         //if in foundation then remove foundation status
-                                        if (holder.inFound() === true) {
-                                            var number = found["f" + holder.foundNo()];
-                                            holder.column = card.column;
-                                            holder.row = card.row + 1;
+                                        if (variables.holder.inFound() === true) {
+                                            var number = variables.found["f" + variables.holder.foundNo()];
+                                            variables.holder.column = card.column;
+                                            variables.holder.row = card.row + 1;
                                             //same as trash
-                                            duang(number, holder);
+                                            variables.duang(number, variables.holder);
                                             //record moving act
-                                            lastAct = holder.name + "," + "move" + "," + holder.foundNo() + "," + "C" + holder.column + "R" + holder.row;
+                                            variables.lastAct = variables.holder.name + "," + "move" + "," + variables.holder.foundNo() + "," + "C" + variables.holder.column + "R" + variables.holder.row;
                                         }
                                     }
                                     //remove holding status
-                                    holding = false;
-                                    holder = undefined;
+                                    variables.holding = false;
+                                    variables.holder = undefined;
                                     //and that's it
                                     return;
                                 }
@@ -586,9 +578,9 @@ export default class Main extends React.Component {
                             //end of if holding
                         }
                         //take up a card if holding nothing
-                        if (holding === false) {
-                            holding = true;
-                            holder = card;
+                        if (variables.holding === false) {
+                            variables.holding = true;
+                            variables.holder = card;
                             return;
                         }
                         //end of if card is face up
@@ -596,6 +588,216 @@ export default class Main extends React.Component {
                 };
                 //just add a function to use return
                 mainDish();
+                console.log(variables.holding)
+                variables.render();
+            },
+            bottomClicked: function(id) {
+                var column = parseInt(id);
+                //check if holding a card and is a king
+                if (variables.holding === true){
+                    var row = variables.holder.row;
+                    if (variables.holder.number === 13){
+                        //check if column is empty
+                        if (variables.columnHeight(column) === 0){
+                            //if it's empty then move the whole thing under it
+                            //gathering list(done by c & p)
+                            var list = [];
+                            list.push(variables.holder);
+                            for (var i = variables.holder.row + 1; i <= 17; i ++){
+                                var cardBelow = variables.getCardPos(variables.holder.column, i);
+                                if (cardBelow !== undefined){
+                                    list.push(cardBelow);
+                                } else {
+                                    break;
+                                }
+                            }
+                            //move them under the column
+                            for (var i = 0; i < list.length; i ++){
+                                //move to correct place
+                                list[i].column = parseInt(column);
+                                list[i].row = i + 1;
+                            }
+                            if (variables.holder.inTrash() === true){
+                                variables.lastAct = variables.holder.name + "," + "move" + "," + "trash" + "," + "C" + variables.holder.column + "R" + variables.holder.row;
+                            } else if (variables.holder.inFound() === true) {
+                                variables.lastAct = variables.holder.name + "," + "move" + "," + "found" + "," + "C" + variables.holder.column + "R" + variables.holder.row;
+                            } else {
+                                variables.lastAct = variables.holder.name + "," + "move" + "," + "C" + column + "R" + row + "," + "C" + variables.holder.column + "R" + variables.holder.row;
+                            }
+                            //if holder is in trash, remove from trash(or reveal)
+                            if (variables.holder.inTrash() === true){
+                                variables.duang(variables.reveal, variables.holder.name);
+                            }
+                            //if holder is in foundation, then the player is dumb
+                            if (variables.holder.inFound() === true){
+                                variables.duang(variables.found["f"+variables.holder.foundNo()], variables.holder);
+                            }
+                            //remove holding status
+                            variables.holder = undefined;
+                            variables.holding = false;
+                            variables.render();
+                        }
+                    }
+                }
+            },
+            topClicked: function(id){
+                //move cards to foundation
+                var number = parseInt(id);
+                //check if it's a number
+                if (!isNaN(number)){
+                    //if so then the player clicks the foundation (which is an array)
+                    var foundation = variables.found["f"+number];
+                    //check if holding a card
+                    if (variables.holding === true){
+                        //check if holding card is in foundation
+                        if (variables.holder.inFound() === true){
+                            //wat wat wat wat wat wat wat
+                            variables.holding = false;
+                            variables.holder = undefined;
+                            variables.render();
+                            return;
+                        }
+                        //check if foundation is empty
+                        if (foundation.length === 0){
+                            //check if the card holding is an ace
+                            if (parseInt(variables.holder.number) === 1){
+                                //record action
+                                if (variables.holder.inTrash() === true){
+                                    variables.lastAct = variables.holder.name + "," + "found" + "," + "trash" +"," + number;
+                                } else {
+                                    variables.lastAct = variables.holder.name + "," + "found" + "," + "C"+variables.holder.column + "R"+variables.holder.row + "," + number;
+                                }
+                                //reset the card's position
+                                variables.holder.reset();
+                                //then move the card to foundation
+                                foundation.push(variables.holder);
+                                //remove holding status
+                                variables.holding = false;
+                                variables.holder = undefined;
+                                variables.render();
+                            }
+                        } else {
+                            var last = foundation[foundation.length - 1];
+                            //else check if the card that is holding is one more number than the last card in foundation
+                            if (variables.holder.isOneHigher(last)){
+                                //then check if suits are the same
+                                if (variables.holder.suit === last.suit){
+                                    //then check if the holder card is the last card at the column
+                                    if (variables.getCardPos(variables.holder.column, variables.holder.row + 1) === undefined){
+                                        //record action
+                                        if (variables.holder.inTrash() === true){
+                                            variables.lastAct = variables.holder.name + "," + "found" + "," + "trash" +"," + number;
+                                        } else {
+                                            variables.lastAct = variables.holder.name + "," + "found" + "," + "C"+variables.holder.column + "R"+variables.holder.row + "," + number;
+                                        }
+                                        //reset the card's position
+                                        variables.holder.reset();
+                                        //then move holder to the foundation
+                                        variables.foundation.push(variables.holder);
+                                        //remove holding status
+                                        variables.holding = false;
+                                        variables.holder = undefined;
+                                        variables.render();
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                    //if not holding a card then check if any card is on foundation
+                        if (foundation.length > 0){
+                            //if so hold the last card in the foundation
+                            var card = foundation[foundation.length - 1];
+                            variables.holding = true
+                            variables.holder = card;
+                            variables.render();
+                        }
+                    }
+                }
+            },
+            takeBack: function(){
+                console.log(variables.lastAct);
+                if (variables.lastAct !== undefined){
+                    var code = variables.lastAct.split(",");
+                    console.log(code);
+                    var name = code[0];
+                    var action = code[1];
+                    var prev = code[2];
+                    var next = code[3];
+                    //move action
+                    if (action === "move"){
+                        //aka move from anywhere to field
+                        //from trash or found
+                        if (prev === "trash" || prev.length === 1){
+                            //reset card
+                            variables.cards[name].reset();
+                            //then push back to reveal
+                            if (prev === "trash"){
+                                variables.reveal.push(parseInt(name));
+                            } else {
+                                //push back to foundation
+                                variables.found["f"+prev].push(parseInt(name));
+                            }
+                            variables.lastAct = undefined;
+                        }
+                        //from field
+                        if (prev.length > 1){
+                            //get previous location
+                            var cPos = prev.indexOf("C");
+                            var rPos = prev.indexOf("R");
+                            //get the card's column
+                            var columnCards = variables.cards[name].getColumn();
+                            var descend = [];
+                            //loop through the columns starting from the moved card
+                            for (var i = variables.cards[name].row; i <= columnCards.length; i ++){
+                                //push any cards below the worked card to the array
+                                descend.push(columnCards[i - 1]);
+                            }
+                            console.log("descend: "+descend);
+                            //send all cards back in time
+                            var targetRow = parseInt(prev.substring(cPos + 1, rPos));
+                            var targetColumn = parseInt(prev.substring(rPos + 1));
+                            for (var i = targetRow; i < targetRow + descend.length; i ++){
+                                descend[i - targetRow].column = targetColumn;
+                                descend[i - targetRow].row = i;
+                            }
+                            console.log("getting pos");
+                            console.log(variables.getCardPos(variables.cards[name].column, variables.cards[name].row - 1));
+                            //cover up the exposed card
+                            if (variables.getCardPos(variables.cards[name].column, variables.cards[name].row - 1) !== undefined){
+                                variables.getCardPos(variables.cards[name].column, variables.cards[name].row - 1).show = false;
+                            }
+                            variables.lastAct = undefined;
+                        }
+                    }
+                    //trash action
+                    if (action === "trash"){
+                        //aka when trash is clicked
+                        variables.trash.unshift(variables.reveal.pop());
+                        variables.lastAct = undefined;
+                    }
+                    //found action
+                    if (action === "found"){
+                        //aka move from anywhere to found
+                        //if prev loaction is trash
+                        if (prev === "trash"){
+                            //reset card
+                            variables.cards[name].reset();
+                            //then push back to reveal
+                            variables.reveal.push(parseInt(name));
+                            variables.lastAct = undefined;
+                        } else {
+                            //reset card
+                            variables.cards[name].reset();
+                            //set to previous location
+                            var cPos = prev.indexOf("C");
+                            var rPos = prev.indexOf("R");
+                            variables.cards[name].column = parseInt(prev.substring(cPos + 1, rPos));
+                            variables.cards[name].row = parseInt(prev.substring(rPos + 1));
+                            variables.lastAct = undefined;
+                        }
+                    }
+                }
+                //render stuff
                 variables.render();
             }
         };

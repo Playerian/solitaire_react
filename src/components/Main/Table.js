@@ -10,9 +10,9 @@ export default class Table extends React.Component {
       <div id="table">
         < Timer id="timer"/>
         < StartGame id="start" setVar={(index, value) => this.props.setVar(index, value)} getVar={(index) => this.props.getVar(index)}/>
-        < TakeBack id="tb"/>
+        < TakeBack id="tb" getVar={(index) => this.props.getVar(index)} />
         <p>% of card showing</p>
-        < CardShowing setVar={(index, value) => this.props.setVar(index, value)}/>
+        < CardShowing setVar={(index, value) => this.props.setVar(index, value)} getVar={(index) => this.props.getVar(index)}/>
       </div>
     );
   } 
