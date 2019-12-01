@@ -6,7 +6,7 @@ export default class Columns extends React.Component {
     let divs = [];
     for (let i = 0; i < 7; i ++){
       let idName = "c" + (i + 1);
-      divs.push(<Bottom id={idName} className="bottom" key={i}/>);
+      divs.push(<Bottom cardComponent={this.props.cardComponent} id={idName} className="bottom" key={i}/>);
     }
     return(
       <div id={this.props.id}>

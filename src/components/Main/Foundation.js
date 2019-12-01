@@ -1,5 +1,7 @@
 import React from 'react';
 import Top from './Foundation/Top.js';
+import Reveal from './Foundation/Reveal.js';
+import Trash from './Foundation/Trash.js';
 
 export default class Foundation extends React.Component {
   render(){
@@ -9,13 +11,13 @@ export default class Foundation extends React.Component {
     console.log(getVar);
     return(
       <div id={this.props.id}>
-        <Top id="f1" className="top"/>
-        <Top id="f2" className="top"/>
-        <Top id="f3" className="top"/>
-        <Top id="f4" className="top"/>
-        <Top id="useless" className="top empty"/>
-        <Top id="reveal" className="top empty"/>
-        <Top id="trash" className="top"/>
+        <Top cardComponent={this.props.cardComponent} id="f1" className="top" key={1} setVar={(index, value) => setVar(index, value)} getVar={(index) => getVar(index)}/>
+        <Top cardComponent={this.props.cardComponent} id="f2" className="top" key={2} setVar={(index, value) => setVar(index, value)} getVar={(index) => getVar(index)}/>
+        <Top cardComponent={this.props.cardComponent} id="f3" className="top" key={3} setVar={(index, value) => setVar(index, value)} getVar={(index) => getVar(index)}/>
+        <Top cardComponent={this.props.cardComponent} id="f4" className="top" key={4} setVar={(index, value) => setVar(index, value)} getVar={(index) => getVar(index)}/>
+        <Top cardComponent={this.props.cardComponent} id="useless" className="top empty"/>
+        <Reveal cardComponent={this.props.cardComponent} id="reveal" className="top empty" setVar={(index, value) => setVar(index, value)} getVar={(index) => getVar(index)}/>
+        <Trash cardComponent={this.props.cardComponent} id="trash" className="top" setVar={(index, value) => setVar(index, value)} getVar={(index) => getVar(index)}/>
       </div>
     );
   } 
