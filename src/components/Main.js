@@ -277,6 +277,10 @@ export default class Main extends React.Component {
                 //end of init
             },
             render: function () {
+                let showPercentOfCard = variables.showPercentOfCard;
+                let height = variables.height;
+                let cards = variables.cards;
+                let holder = variables.holder;
                 //Any necessary changes relative to cards
                 //if the bottommost card in a column is facedown, then flip it up
                 for (let i = 1; i <= 7; i++) {
@@ -313,7 +317,7 @@ export default class Main extends React.Component {
                             element.style = {}
                             element.style.top = (i2 - 1) * (100 - showPercentOfCard) / 100 * height * -1+"px";//element.css("top", (i2 - 1) * (100 - showPercentOfCard) / 100 * height * -1+"px");
                             //add z-axis to each cards
-                            element.style["z-index"] = i;//element.css("z-index", i);
+                            element.style["zIndex"] = i;//element.css("z-index", i);
                             //add highlight if holder is same 
                             if (variables.holder === card){
                                 //check if holder is last card
@@ -332,6 +336,8 @@ export default class Main extends React.Component {
                                     element.class += "midlight";//element.addClass("midlight");
                                 }
                             }
+                            element.style.width = variables.width+"px";
+                            element.style.height = variables.height+"px";
                             //$("#c"+i).append(element);
                             //react is cancer
                             columnComponents.push(<img className={element.class} style={element.style} src={element.src} id={element.id} column={element.column} row={element.row}></img>);
@@ -352,7 +358,10 @@ export default class Main extends React.Component {
                     element.class += " trash";// element.addClass("trash");
                     element.class += " unclickable";// element.addClass("unclickable");
                     element.src = "cards/back.png";// element.attr("src", "cards/back.png");
-                    allTrashComponents.push(<img className={element.class} id={element.id} src={element.src}></img>);// $("#trash").append(element);
+                    element.style = {};
+                    element.style.width = variables.width+"px";
+                    element.style.height = variables.height+"px";
+                    allTrashComponents.push(<img className={element.class} id={element.id} src={element.src} style={element.style}></img>);// $("#trash").append(element);
                 }
                 //render in reveal
                 let allRevealComponents = [];
@@ -366,7 +375,10 @@ export default class Main extends React.Component {
                     if (holder === card){
                         element.class += " highlight";//element.addClass("highlight");
                     }
-                    allRevealComponents.push(<img src={element.src} className={element.class} src={element.src} id={element.id}></img>);//$("#reveal").append(element);
+                    element.style = {};
+                    element.style.width = variables.width+"px";
+                    element.style.height = variables.height+"px";
+                    allRevealComponents.push(<img src={element.src} className={element.class} src={element.src} id={element.id} style={element.style}></img>);//$("#reveal").append(element);
                 }
                 //render in foundation
                 let allFoundComponents = [];
@@ -384,8 +396,11 @@ export default class Main extends React.Component {
                         if (holder === card){
                             element.class += " highlight";//element.addClass("highlight");
                         }
+                        element.style = {};
+                        element.style.width = variables.width+"px";
+                        element.style.height = variables.height+"px";
                         // $("#f"+i2).append(element);
-                        allFoundComponents.push(<img className={element.class} id={element.id} src={element.src}></img>);
+                        allFoundComponents.push(<img className={element.class} id={element.id} src={element.src} style={element.style}></img>);
                     }
                 }
 
@@ -619,6 +634,7 @@ export default class Main extends React.Component {
                 <Table setVar={(index, value) => this.setVar(index, value)} getVar={(index) => this.getVar(index)} />
                 <div className="preload">
                     {allCardPictures}
+                    <img className="preload" src="cards/back.png" alt="" key={0} ></img>
                 </div>
                 <div id="father">
                     <div id="top">

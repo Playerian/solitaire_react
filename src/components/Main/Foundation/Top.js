@@ -15,7 +15,7 @@ export default class Top extends React.Component {
     let running = getVar("beginned");
     return(
       <div id={this.props.id} className={this.props.className}>
-        
+        {this.props.data}
       </div>
     );
   } 

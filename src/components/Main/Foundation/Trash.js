@@ -10,11 +10,20 @@ export default class Trash extends React.Component {
     }
   }
   render(){
-    let cardComponent = this.props.cardComponent;
-    return(
-      <div id={this.props.id} className={this.props.className} onClick={(e) => this.handleClick(e)}>
+    let CardComponent = this.props.cardComponent;
+    let data = this.props.data;
+    if (data){
+      return(
+        <div id={this.props.id} className={this.props.className} onClick={(e) => this.handleClick(e)}>
+          {data}
+        </div>
+      );
+    }else{
+      return(
+        <div id={this.props.id} className={this.props.className} onClick={(e) => this.handleClick(e)}>
 
-      </div>
-    );
+        </div>
+      );
+    }
   } 
 }

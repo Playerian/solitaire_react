@@ -16,8 +16,8 @@ export default class Foundation extends React.Component {
         <Top cardComponent={this.props.cardComponent} id="f3" className="top" key={3} setVar={(index, value) => setVar(index, value)} getVar={(index) => getVar(index)}/>
         <Top cardComponent={this.props.cardComponent} id="f4" className="top" key={4} setVar={(index, value) => setVar(index, value)} getVar={(index) => getVar(index)}/>
         <Top cardComponent={this.props.cardComponent} id="useless" className="top empty"/>
-        <Reveal cardComponent={this.props.cardComponent} id="reveal" className="top empty" setVar={(index, value) => setVar(index, value)} getVar={(index) => getVar(index)}/>
-        <Trash cardComponent={this.props.cardComponent} id="trash" className="top" setVar={(index, value) => setVar(index, value)} getVar={(index) => getVar(index)}/>
+        <Reveal data={this.props.reveal} cardComponent={this.props.cardComponent} id="reveal" className="top empty" setVar={(index, value) => setVar(index, value)} getVar={(index) => getVar(index)}/>
+        <Trash data={this.props.trash} cardComponent={this.props.cardComponent} id="trash" className="top" setVar={(index, value) => setVar(index, value)} getVar={(index) => getVar(index)}/>
       </div>
     );
   } 
