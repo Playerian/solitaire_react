@@ -31,7 +31,7 @@ export default class Main extends React.Component {
             time: 0,
             beginned: false,
             preventer: false,
-            lastAct: "",
+            lastAct: [],
             //constructor
             setCard: function (num, suit) {
                 let vars = mainComponent.state.variables;
@@ -203,6 +203,7 @@ export default class Main extends React.Component {
                 variables.reveal = [];
                 variables.holder = undefined;
                 variables.holding = false;
+                variables.lastAct = [];
                 //card declare
                 for (let i = 1; i <= 13; i++) {
                     for (var i2 = 1; i2 <= 4; i2++) {
@@ -255,22 +256,7 @@ export default class Main extends React.Component {
                     variables.beginned = true;
                     variables.timer = setInterval(function () {
                         variables.time++;
-                        var second = variables.time;
-                        var minute = 0;
-                        while (second >= 60) {
-                            second -= 60;
-                            minute++;
-                        }
-                        minute = minute.toString(10);
-                        second = second.toString(10);
-                        while (minute.length < 2) {
-                            minute = "0" + minute;
-                        }
-
-                        while (second.length < 2) {
-                            second = "0" + second;
-                        }
-                        //$("#timer").text(minute+":"+second);
+                        mainComponent.setState({variables: variables});//$("#timer").text(minute+":"+second);
                     }, 1000);
                 }
 
@@ -404,7 +390,8 @@ export default class Main extends React.Component {
                         oneFoundComponents.push(<Card getVar={(index) => mainComponent.getVar(index)} className={element.class} id={element.id} src={element.src} style={element.style}/>);
                     }
                     allFoundComponents.push(oneFoundComponents);
-                }
+                };
+                this.checkVictory();
 
                 //react is cancer
                 mainComponent.setState({
@@ -426,7 +413,7 @@ export default class Main extends React.Component {
             //component specific function
             trashClicked: function () {
                 //record move
-                variables.lastAct = "undefined,trash,undefined,undefined";
+                variables.lastAct.push("undefined,trash,undefined,undefined");
                 //clear all selections
                 variables.holding = false;
                 variables.holder = undefined;
@@ -455,7 +442,6 @@ export default class Main extends React.Component {
             },
             cardClicked: function (id) {
                 var card = variables.cards[parseInt(id)];
-                console.log(card);
                 //main function (just for quick use of return)
                 function mainDish() {
                     //check if card is face up
@@ -479,9 +465,9 @@ export default class Main extends React.Component {
                                                 if (variables.getCardPos(variables.holder.column, variables.holder.row + 1) === undefined || variables.holder.inTrash() === true) {
                                                     //record action
                                                     if (variables.holder.inTrash() === true) {
-                                                        variables.lastAct = variables.holder.name + "," + "found" + "," + "trash" + "," + number;
+                                                        variables.lastAct.push(variables.holder.name + "," + "found" + "," + "trash" + "," + number);
                                                     } else {
-                                                        variables.lastAct = variables.holder.name + "," + "found" + "," + "C" + variables.holder.column + "R" + variables.holder.row + "," + number;
+                                                        variables.lastAct.push(variables.holder.name + "," + "found" + "," + "C" + variables.holder.column + "R" + variables.holder.row + "," + number);
                                                     }
                                                     //reset the card's position
                                                     variables.holder.reset();
@@ -496,9 +482,9 @@ export default class Main extends React.Component {
                                         if (card.number === 1) {
                                             //record action
                                             if (variables.holder.inTrash() === true) {
-                                                variables.lastAct = variables.holder.name + "," + "found" + "," + "trash" + "," + number;
+                                                variables.lastAct.push(variables.holder.name + "," + "found" + "," + "trash" + "," + number);
                                             } else {
-                                                variables.lastAct = variables.holder.name + "," + "found" + "," + "C" + variables.holder.column + "R" + variables.holder.row + "," + number;
+                                                variables.lastAct.push(variables.holder.name + "," + "found" + "," + "C" + variables.holder.column + "R" + variables.holder.row + "," + number);
                                             }
                                             //reset the card's position
                                             variables.holder.reset();
@@ -543,7 +529,7 @@ export default class Main extends React.Component {
                                             list[i].row = card.row + i + 1;
                                         }
                                         //record moving act
-                                        variables.lastAct = variables.holder.name + "," + "move" + "," + "C" + column + "R" + row + "," + "C" + variables.holder.column + "R" + variables.holder.row;
+                                        variables.lastAct.push(variables.holder.name + "," + "move" + "," + "C" + column + "R" + row + "," + "C" + variables.holder.column + "R" + variables.holder.row);
                                     } else {
                                         //if in trash then move directly to field
                                         if (variables.holder.inTrash() === true) {
@@ -552,7 +538,7 @@ export default class Main extends React.Component {
                                             //also remove holder in reveal pile
                                             variables.duang(variables.reveal, variables.holder.name);
                                             //record moving act
-                                            variables.lastAct = variables.holder.name + "," + "move" + "," + "trash" + "," + "C" + variables.holder.column + "R" + variables.holder.row;
+                                            variables.lastAct.push(variables.holder.name + "," + "move" + "," + "trash" + "," + "C" + variables.holder.column + "R" + variables.holder.row);
                                         }
                                         //if in foundation then remove foundation status
                                         if (variables.holder.inFound() === true) {
@@ -562,7 +548,7 @@ export default class Main extends React.Component {
                                             //same as trash
                                             variables.duang(number, variables.holder);
                                             //record moving act
-                                            variables.lastAct = variables.holder.name + "," + "move" + "," + variables.holder.foundNo() + "," + "C" + variables.holder.column + "R" + variables.holder.row;
+                                            variables.lastAct.push(variables.holder.name + "," + "move" + "," + variables.holder.foundNo() + "," + "C" + variables.holder.column + "R" + variables.holder.row);
                                         }
                                     }
                                     //remove holding status
@@ -588,7 +574,6 @@ export default class Main extends React.Component {
                 };
                 //just add a function to use return
                 mainDish();
-                console.log(variables.holding)
                 variables.render();
             },
             bottomClicked: function(id) {
@@ -618,11 +603,11 @@ export default class Main extends React.Component {
                                 list[i].row = i + 1;
                             }
                             if (variables.holder.inTrash() === true){
-                                variables.lastAct = variables.holder.name + "," + "move" + "," + "trash" + "," + "C" + variables.holder.column + "R" + variables.holder.row;
+                                variables.lastAct.push(variables.holder.name + "," + "move" + "," + "trash" + "," + "C" + variables.holder.column + "R" + variables.holder.row);
                             } else if (variables.holder.inFound() === true) {
-                                variables.lastAct = variables.holder.name + "," + "move" + "," + "found" + "," + "C" + variables.holder.column + "R" + variables.holder.row;
+                                variables.lastAct.push(variables.holder.name + "," + "move" + "," + "found" + "," + "C" + variables.holder.column + "R" + variables.holder.row);
                             } else {
-                                variables.lastAct = variables.holder.name + "," + "move" + "," + "C" + column + "R" + row + "," + "C" + variables.holder.column + "R" + variables.holder.row;
+                                variables.lastAct.push(variables.holder.name + "," + "move" + "," + "C" + column + "R" + row + "," + "C" + variables.holder.column + "R" + variables.holder.row);
                             }
                             //if holder is in trash, remove from trash(or reveal)
                             if (variables.holder.inTrash() === true){
@@ -663,9 +648,9 @@ export default class Main extends React.Component {
                             if (parseInt(variables.holder.number) === 1){
                                 //record action
                                 if (variables.holder.inTrash() === true){
-                                    variables.lastAct = variables.holder.name + "," + "found" + "," + "trash" +"," + number;
+                                    variables.lastAct.push(variables.holder.name + "," + "found" + "," + "trash" +"," + number);
                                 } else {
-                                    variables.lastAct = variables.holder.name + "," + "found" + "," + "C"+variables.holder.column + "R"+variables.holder.row + "," + number;
+                                    variables.lastAct.push(variables.holder.name + "," + "found" + "," + "C"+variables.holder.column + "R"+variables.holder.row + "," + number);
                                 }
                                 //reset the card's position
                                 variables.holder.reset();
@@ -686,9 +671,9 @@ export default class Main extends React.Component {
                                     if (variables.getCardPos(variables.holder.column, variables.holder.row + 1) === undefined){
                                         //record action
                                         if (variables.holder.inTrash() === true){
-                                            variables.lastAct = variables.holder.name + "," + "found" + "," + "trash" +"," + number;
+                                            variables.lastAct.push(variables.holder.name + "," + "found" + "," + "trash" +"," + number);
                                         } else {
-                                            variables.lastAct = variables.holder.name + "," + "found" + "," + "C"+variables.holder.column + "R"+variables.holder.row + "," + number;
+                                            variables.lastAct.push(variables.holder.name + "," + "found" + "," + "C"+variables.holder.column + "R"+variables.holder.row + "," + number);
                                         }
                                         //reset the card's position
                                         variables.holder.reset();
@@ -716,8 +701,8 @@ export default class Main extends React.Component {
             },
             takeBack: function(){
                 console.log(variables.lastAct);
-                if (variables.lastAct !== undefined){
-                    var code = variables.lastAct.split(",");
+                if (variables.lastAct.length > 0){
+                    var code = variables.lastAct[variables.lastAct.length - 1].split(",");
                     console.log(code);
                     var name = code[0];
                     var action = code[1];
@@ -737,7 +722,7 @@ export default class Main extends React.Component {
                                 //push back to foundation
                                 variables.found["f"+prev].push(parseInt(name));
                             }
-                            variables.lastAct = undefined;
+                            variables.lastAct.pop();
                         }
                         //from field
                         if (prev.length > 1){
@@ -766,14 +751,14 @@ export default class Main extends React.Component {
                             if (variables.getCardPos(variables.cards[name].column, variables.cards[name].row - 1) !== undefined){
                                 variables.getCardPos(variables.cards[name].column, variables.cards[name].row - 1).show = false;
                             }
-                            variables.lastAct = undefined;
+                            variables.lastAct.pop();
                         }
                     }
                     //trash action
                     if (action === "trash"){
                         //aka when trash is clicked
                         variables.trash.unshift(variables.reveal.pop());
-                        variables.lastAct = undefined;
+                        variables.lastAct.pop();
                     }
                     //found action
                     if (action === "found"){
@@ -784,31 +769,59 @@ export default class Main extends React.Component {
                             variables.cards[name].reset();
                             //then push back to reveal
                             variables.reveal.push(parseInt(name));
-                            variables.lastAct = undefined;
+                            variables.lastAct.pop();
                         } else {
                             //reset card
                             variables.cards[name].reset();
                             //set to previous location
                             var cPos = prev.indexOf("C");
                             var rPos = prev.indexOf("R");
+                            //cover up the exposed card
+                            if (variables.getCardPos(variables.cards[name].column, variables.cards[name].row - 1) !== undefined){
+                                variables.getCardPos(variables.cards[name].column, variables.cards[name].row - 1).show = false;
+                            }
                             variables.cards[name].column = parseInt(prev.substring(cPos + 1, rPos));
                             variables.cards[name].row = parseInt(prev.substring(rPos + 1));
-                            variables.lastAct = undefined;
+                            variables.lastAct.pop();
                         }
                     }
                 }
                 //render stuff
                 variables.render();
+            },
+            checkVictory: function(){
+                //win after all cards are top left
+                let found = variables.found;
+                for (let key in found){
+                    let foundation = found[key];
+                    console.log(foundation);
+                    //empty?
+                    if (foundation.length === 0){
+                        return false;
+                    }
+                    //last card
+                    if (foundation[foundation.length - 1].number !== 13){
+                        return false;
+                    }
+                }
+                //this means you win
+                this.setState({win: true});
             }
         };
         //final set
         this.state = { 
             variables: variables,
+            win: false,
             allColumnComponents: [],
             allFoundComponents: [],
             allRevealComponents: [],
             allTrashComponents: []
         };
+    }
+    //retry game
+    retryGame(){
+        this.setState({win: false});
+        this.variables.init();
     }
     //profiting children
     setVar(index, value) {
@@ -831,20 +844,29 @@ export default class Main extends React.Component {
                 allCardPictures.push(<img className="preload" src={source} alt="" key={i + ":" + j} ></img>);
             }
         }
-        return (
-            <div className="App">
-                <Table setVar={(index, value) => this.setVar(index, value)} getVar={(index) => this.getVar(index)} />
-                <div className="preload">
-                    {allCardPictures}
-                    <img className="preload" src="cards/back.png" alt="" key={0} ></img>
+        if (this.state.win){
+            return (
+                <div className="App">
+                    <h1>Congratulation! You beat the game!</h1>
+                    <button onClick={() => this.retryGame()}>Retry</button>
                 </div>
-                <div id="father">
-                    <div id="top">
-                        <Foundation trash={this.state.allTrashComponents} reveal={this.state.allRevealComponents} found={this.state.allFoundComponents} id="foundation" setVar={(index, value) => this.setVar(index, value)} getVar={(index) => this.getVar(index)} cardComponent={Card} />
+            )
+        }else{
+            return (
+                <div className="App">
+                    <Table setVar={(index, value) => this.setVar(index, value)} getVar={(index) => this.getVar(index)} />
+                    <div className="preload">
+                        {allCardPictures}
+                        <img className="preload" src="cards/back.png" alt="" key={0} ></img>
                     </div>
-                    <Columns data={this.state.allColumnComponents} id="columns" setVar={(index, value) => this.setVar(index, value)} getVar={(index) => this.getVar(index)} cardComponent={Card} />
+                    <div id="father">
+                        <div id="top">
+                            <Foundation trash={this.state.allTrashComponents} reveal={this.state.allRevealComponents} found={this.state.allFoundComponents} id="foundation" setVar={(index, value) => this.setVar(index, value)} getVar={(index) => this.getVar(index)} cardComponent={Card} />
+                        </div>
+                        <Columns data={this.state.allColumnComponents} id="columns" setVar={(index, value) => this.setVar(index, value)} getVar={(index) => this.getVar(index)} cardComponent={Card} />
+                    </div>
                 </div>
-            </div>
-        );
+            );
+        }
     }
 }

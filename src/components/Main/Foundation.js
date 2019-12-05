@@ -8,7 +8,6 @@ export default class Foundation extends React.Component {
     let getVar = this.props.getVar;
     let setVar = this.props.setVar;
     let running = getVar("beginned");
-    console.log(this.props.found);
     return(
       <div id={this.props.id}>
         <Top data={this.props.found[0]}cardComponent={this.props.cardComponent} id="f1" className="top" key={1} setVar={(index, value) => setVar(index, value)} getVar={(index) => getVar(index)}/>
