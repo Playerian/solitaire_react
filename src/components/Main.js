@@ -477,8 +477,8 @@ export default class Main extends React.Component {
                                             }
                                         }
                                     } else {
-                                        //if not empty
-                                        //if ace push to found
+                                        //if empty
+                                        //if ace then push to found
                                         if (card.number === 1) {
                                             //record action
                                             if (variables.holder.inTrash() === true) {
@@ -490,6 +490,7 @@ export default class Main extends React.Component {
                                             variables.holder.reset();
                                             //then move holder to the foundation
                                             foundation.push(variables.holder);
+                                            break;
                                         }
                                     }
                                 }
@@ -777,8 +778,8 @@ export default class Main extends React.Component {
                             var cPos = prev.indexOf("C");
                             var rPos = prev.indexOf("R");
                             //cover up the exposed card
-                            if (variables.getCardPos(variables.cards[name].column, variables.cards[name].row - 1) !== undefined){
-                                variables.getCardPos(variables.cards[name].column, variables.cards[name].row - 1).show = false;
+                            if (variables.getCardPos(parseInt(prev.substring(cPos + 1, rPos)), parseInt(prev.substring(rPos + 1)) - 1) !== undefined){
+                                variables.getCardPos(parseInt(prev.substring(cPos + 1, rPos)), parseInt(prev.substring(rPos + 1)) - 1).show = false;
                             }
                             variables.cards[name].column = parseInt(prev.substring(cPos + 1, rPos));
                             variables.cards[name].row = parseInt(prev.substring(rPos + 1));
@@ -794,7 +795,6 @@ export default class Main extends React.Component {
                 let found = variables.found;
                 for (let key in found){
                     let foundation = found[key];
-                    console.log(foundation);
                     //empty?
                     if (foundation.length === 0){
                         return false;
