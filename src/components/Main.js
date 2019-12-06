@@ -317,16 +317,16 @@ export default class Main extends React.Component {
                             //add lowlight if last below holder
                             if (card.isBelowHolder() === true){
                                 if (card.getColumn()[card.getColumn().length - 1] === card){
-                                    element.class += "lowlight";//element.addClass("lowlight");
+                                    element.class += " lowlight";//element.addClass("lowlight");
                                 } else {
-                                    element.class += "midlight";//element.addClass("midlight");
+                                    element.class += " midlight";//element.addClass("midlight");
                                 }
                             }
                             element.style.width = variables.width+"px";
                             element.style.height = variables.height+"px";
                             //$("#c"+i).append(element);
                             //react is cancer
-                            columnComponents.push(<Card getVar={(index) => mainComponent.getVar(index)} className={element.class} style={element.style} src={element.src} id={element.id} column={element.column} row={element.row}/>);
+                            columnComponents.push(<Card key={element.column + ":" + element.row} getVar={(index) => mainComponent.getVar(index)} className={element.class} style={element.style} src={element.src} id={element.id} column={element.column} row={element.row}/>);
                         }else{
                             break;
                         }
@@ -347,7 +347,7 @@ export default class Main extends React.Component {
                     element.style = {};
                     element.style.width = variables.width+"px";
                     element.style.height = variables.height+"px";
-                    allTrashComponents.push(<Card getVar={(index) => mainComponent.getVar(index)} className={element.class} id={element.id} src={element.src} style={element.style}/>);// $("#trash").append(element);
+                    allTrashComponents.push(<Card key={i} getVar={(index) => mainComponent.getVar(index)} className={element.class} id={element.id} src={element.src} style={element.style}/>);// $("#trash").append(element);
                 }
                 //render in reveal
                 let allRevealComponents = [];
@@ -364,7 +364,7 @@ export default class Main extends React.Component {
                     element.style = {};
                     element.style.width = variables.width+"px";
                     element.style.height = variables.height+"px";
-                    allRevealComponents.push(<Card getVar={(index) => mainComponent.getVar(index)} src={element.src} className={element.class} src={element.src} id={element.id} style={element.style}/>);//$("#reveal").append(element);
+                    allRevealComponents.push(<Card key={i} getVar={(index) => mainComponent.getVar(index)} src={element.src} className={element.class} src={element.src} id={element.id} style={element.style}/>);//$("#reveal").append(element);
                 }
                 //render in foundation
                 let allFoundComponents = [];
@@ -387,11 +387,12 @@ export default class Main extends React.Component {
                         element.style.width = variables.width+"px";
                         element.style.height = variables.height+"px";
                         // $("#f"+i2).append(element);
-                        oneFoundComponents.push(<Card getVar={(index) => mainComponent.getVar(index)} className={element.class} id={element.id} src={element.src} style={element.style}/>);
+                        oneFoundComponents.push(<Card key={i + ":" + i2} getVar={(index) => mainComponent.getVar(index)} className={element.class} id={element.id} src={element.src} style={element.style}/>);
                     }
                     allFoundComponents.push(oneFoundComponents);
                 };
                 this.checkVictory();
+                console.log(this.lastAct);
 
                 //react is cancer
                 mainComponent.setState({
@@ -704,7 +705,6 @@ export default class Main extends React.Component {
                 console.log(variables.lastAct);
                 if (variables.lastAct.length > 0){
                     var code = variables.lastAct[variables.lastAct.length - 1].split(",");
-                    console.log(code);
                     var name = code[0];
                     var action = code[1];
                     var prev = code[2];
@@ -714,6 +714,7 @@ export default class Main extends React.Component {
                         //aka move from anywhere to field
                         //from trash or found
                         if (prev === "trash" || prev.length === 1){
+                            console.log(variables.trash);
                             //reset card
                             variables.cards[name].reset();
                             //then push back to reveal
@@ -724,7 +725,7 @@ export default class Main extends React.Component {
                                 variables.found["f"+prev].push(parseInt(name));
                             }
                             variables.lastAct.pop();
-                        }
+                        }else
                         //from field
                         if (prev.length > 1){
                             //get previous location
@@ -758,8 +759,24 @@ export default class Main extends React.Component {
                     //trash action
                     if (action === "trash"){
                         //aka when trash is clicked
-                        variables.trash.unshift(variables.reveal.pop());
-                        variables.lastAct.pop();
+                        //when open one
+                        if (variables.reveal.length > 0){
+                            variables.trash.unshift(variables.reveal.pop());
+                            variables.lastAct.pop();
+                        }else{
+                            //when back shuffled
+                            //move all back in reveal
+                            var length = variables.trash.length;
+                            for (var i = length - 1; i >= 0; i--) {
+                                //change them into facedown
+                                var card = variables.trash.pop();
+                                variables.cards[card].show = true;
+                                //shift back
+                                variables.reveal.unshift(card);
+                            }
+                        }
+                        
+                        
                     }
                     //found action
                     if (action === "found"){
@@ -789,6 +806,8 @@ export default class Main extends React.Component {
                 }
                 //render stuff
                 variables.render();
+                console.log(variables.trash);
+                console.log(variables.reveal);
             },
             checkVictory: function(){
                 //win after all cards are top left
