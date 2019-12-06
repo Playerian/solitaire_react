@@ -441,8 +441,13 @@ export default class Main extends React.Component {
                     variables.render();
                 }
             },
-            cardClicked: function (id) {
+            cardClicked: function (id, drag) {
                 var card = variables.cards[parseInt(id)];
+                //ignore holding if dragging
+                if (drag){
+                    variables.holder = 0;
+                    variables.holding = false;
+                }
                 //main function (just for quick use of return)
                 function mainDish() {
                     //check if card is face up
@@ -523,15 +528,23 @@ export default class Main extends React.Component {
                                         //after the list has been filled(or not) move them under the (clicked)card
                                         //store the list length first
                                         var listLength = list.length;
+                                        //set lastAct linkage
+                                        let lastActLink = "";
                                         //iterate the list
                                         for (var i = 0; i < listLength; i++) {
                                             //set column same as the card
                                             list[i].column = card.column;
                                             //set row below the card in a fast way
                                             list[i].row = card.row + i + 1;
+                                            //import card into link
+                                            if (i > 0){
+                                                lastActLink += ":" + list[i].name;
+                                            }else{
+                                                lastActLink = list[i].name;
+                                            }
                                         }
                                         //record moving act
-                                        variables.lastAct.push(variables.holder.name + "," + "move" + "," + "C" + column + "R" + row + "," + "C" + variables.holder.column + "R" + variables.holder.row);
+                                        variables.lastAct.push(lastActLink + "," + "move" + "," + "C" + column + "R" + row + "," + "C" + variables.holder.column + "R" + variables.holder.row);
                                     } else {
                                         //if in trash then move directly to field
                                         if (variables.holder.inTrash() === true) {
@@ -598,18 +611,26 @@ export default class Main extends React.Component {
                                     break;
                                 }
                             }
+                            //last act link
+                            let lastActLink = "";
                             //move them under the column
                             for (var i = 0; i < list.length; i ++){
                                 //move to correct place
                                 list[i].column = parseInt(column);
                                 list[i].row = i + 1;
+                                //linking
+                                if (i > 0){
+                                    lastActLink += ":" + list[i].name;
+                                }else{
+                                    lastActLink = list[i].name;
+                                }
                             }
                             if (variables.holder.inTrash() === true){
                                 variables.lastAct.push(variables.holder.name + "," + "move" + "," + "trash" + "," + "C" + variables.holder.column + "R" + variables.holder.row);
                             } else if (variables.holder.inFound() === true) {
                                 variables.lastAct.push(variables.holder.name + "," + "move" + "," + "found" + "," + "C" + variables.holder.column + "R" + variables.holder.row);
                             } else {
-                                variables.lastAct.push(variables.holder.name + "," + "move" + "," + "C" + column + "R" + row + "," + "C" + variables.holder.column + "R" + variables.holder.row);
+                                variables.lastAct.push(lastActLink + "," + "move" + "," + "C" + column + "R" + row + "," + "C" + variables.holder.column + "R" + variables.holder.row);
                             }
                             //if holder is in trash, remove from trash(or reveal)
                             if (variables.holder.inTrash() === true){
@@ -680,7 +701,7 @@ export default class Main extends React.Component {
                                         //reset the card's position
                                         variables.holder.reset();
                                         //then move holder to the foundation
-                                        variables.foundation.push(variables.holder);
+                                        foundation.push(variables.holder);
                                         //remove holding status
                                         variables.holding = false;
                                         variables.holder = undefined;
@@ -706,6 +727,9 @@ export default class Main extends React.Component {
                 if (variables.lastAct.length > 0){
                     var code = variables.lastAct[variables.lastAct.length - 1].split(",");
                     var name = code[0];
+                    if (name.indexOf(":") !== -1){
+                        name = name.substring(0, name.indexOf(":"));
+                    }
                     var action = code[1];
                     var prev = code[2];
                     var next = code[3];
@@ -741,8 +765,8 @@ export default class Main extends React.Component {
                             }
                             console.log("descend: "+descend);
                             //send all cards back in time
-                            var targetRow = parseInt(prev.substring(cPos + 1, rPos));
-                            var targetColumn = parseInt(prev.substring(rPos + 1));
+                            var targetColumn = parseInt(prev.substring(cPos + 1, rPos));
+                            var targetRow = parseInt(prev.substring(rPos + 1));
                             for (var i = targetRow; i < targetRow + descend.length; i ++){
                                 descend[i - targetRow].column = targetColumn;
                                 descend[i - targetRow].row = i;
@@ -762,7 +786,6 @@ export default class Main extends React.Component {
                         //when open one
                         if (variables.reveal.length > 0){
                             variables.trash.unshift(variables.reveal.pop());
-                            variables.lastAct.pop();
                         }else{
                             //when back shuffled
                             //move all back in reveal
@@ -775,8 +798,8 @@ export default class Main extends React.Component {
                                 variables.reveal.unshift(card);
                             }
                         }
-                        
-                        
+                        //cancel record
+                        variables.lastAct.pop();
                     }
                     //found action
                     if (action === "found"){
@@ -806,8 +829,9 @@ export default class Main extends React.Component {
                 }
                 //render stuff
                 variables.render();
-                console.log(variables.trash);
-                console.log(variables.reveal);
+                //reset holding
+                variables.holder = 0;
+                variables.holding = false;
             },
             checkVictory: function(){
                 //win after all cards are top left
@@ -824,7 +848,7 @@ export default class Main extends React.Component {
                     }
                 }
                 //this means you win
-                this.setState({win: true});
+                mainComponent.setState({win: true});
             }
         };
         //final set
@@ -840,7 +864,7 @@ export default class Main extends React.Component {
     //retry game
     retryGame(){
         this.setState({win: false});
-        this.variables.init();
+        this.state.variables.init();
     }
     //profiting children
     setVar(index, value) {
@@ -867,6 +891,7 @@ export default class Main extends React.Component {
             return (
                 <div className="App">
                     <h1>Congratulation! You beat the game!</h1>
+                    <p>Your time is: {this.variables.time}</p>
                     <button onClick={() => this.retryGame()}>Retry</button>
                 </div>
             )
