@@ -1,0 +1,21 @@
+{
+  "files": {
+    "main.css": "/solitaire_react/static/css/main.04c174dc.chunk.css",
+    "main.js": "/solitaire_react/static/js/main.31b9b22b.chunk.js",
+    "main.js.map": "/solitaire_react/static/js/main.31b9b22b.chunk.js.map",
+    "runtime-main.js": "/solitaire_react/static/js/runtime-main.8c18c5af.js",
+    "runtime-main.js.map": "/solitaire_react/static/js/runtime-main.8c18c5af.js.map",
+    "static/js/2.174733d6.chunk.js": "/solitaire_react/static/js/2.174733d6.chunk.js",
+    "static/js/2.174733d6.chunk.js.map": "/solitaire_react/static/js/2.174733d6.chunk.js.map",
+    "index.html": "/solitaire_react/index.html",
+    "precache-manifest.5166927a49bd7b4bd0ca2313d1afa279.js": "/solitaire_react/precache-manifest.5166927a49bd7b4bd0ca2313d1afa279.js",
+    "service-worker.js": "/solitaire_react/service-worker.js",
+    "static/css/main.04c174dc.chunk.css.map": "/solitaire_react/static/css/main.04c174dc.chunk.css.map"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.8c18c5af.js",
+    "static/js/2.174733d6.chunk.js",
+    "static/css/main.04c174dc.chunk.css",
+    "static/js/main.31b9b22b.chunk.js"
+  ]
+}
